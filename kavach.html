@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kavach - Secure Link Shield</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* ==================== CSS VARIABLES ==================== */
+        :root {
+            /* Light theme colors */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            /* Brand colors */
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #e0e7ff;
+            
+            /* Status colors */
+            --safe: #22c55e;
+            --safe-bg: #dcfce7;
+            --safe-border: #86efac;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --warning-border: #fcd34d;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --danger-border: #fca5a5;
+            --info: #3b82f6;
+            --info-bg: #dbeafe;
+            --info-border: #93c5fd;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            /* Spacing & Sizing */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+        }
+
+        /* Dark theme */
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #64748b;
+            --border-color: #334155;
+            --border-light: #475569;
+            
+            --primary-light: #312e81;
+            
+            --safe-bg: #14532d;
+            --safe-border: #166534;
+            --warning-bg: #78350f;
+            --warning-border: #92400e;
+            --danger-bg: #7f1d1d;
+            --danger-border: #991b1b;
+            --info-bg: #1e3a5f;
+            --info-border: #1e40af;
+        }
+
+        /* ==================== RESET & BASE ==================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
+        }
+
+        /* ==================== SCROLLBAR ==================== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        /* ==================== LAYOUT ==================== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-icon i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-toggle i {
+            font-size: 22px;
+            color: var(--text-primary);
+        }
+
+        /* ==================== INPUT SECTION ==================== */
+        .input-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .input-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            background: transparent;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tab-btn i {
+            font-size: 18px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Single URL Input */
+        .url-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+
+        .url-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .url-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .scan-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .scan-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .scan-btn i {
+            font-size: 20px;
+        }
+
+        .scan-btn.scanning i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Batch Input */
+        .batch-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: vertical;
+            outline: none;
+            transition: all var(--transition-fast);
+            margin-bottom: 1rem;
+        }
+
+        .batch-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .batch-textarea::placeholder {
+            color: var(--text-tertiary);
+            font-family: inherit;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .file-upload-area i {
+            font-size: 48px;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-area p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .file-upload-area span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .batch-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .url-count {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ==================== RESULTS SECTION ==================== */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .results-summary {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .summary-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .summary-badge.safe {
+            background: var(--safe-bg);
+            color: var(--safe);
+        }
+
+        .summary-badge.warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .summary-badge.danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .summary-badge i {
+            font-size: 14px;
+        }
+
+        .clear-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .clear-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        /* Result Cards */
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            transition: all var(--transition-fast);
+        }
+
+        .result-card.safe {
+            border-color: var(--safe-border);
+        }
+
+        .result-card.warning {
+            border-color: var(--warning-border);
+        }
+
+        .result-card.danger {
+            border-color: var(--danger-border);
+        }
+
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .status-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .status-icon.safe {
+            background: var(--safe-bg);
+            color: var(--safe);
+        }
+
+        .status-icon.warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .status-icon.danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .status-icon i {
+            font-size: 24px;
+        }
+
+        .result-url-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .result-url {
+            font-size: 0.95rem;
+            font-weight: 600;
+            word-break: break-all;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-status-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .result-status-text.safe {
+            color: var(--safe);
+        }
+
+        .result-status-text.warning {
+            color: var(--warning);
+        }
+
+        .result-status-text.danger {
+            color: var(--danger);
+        }
+
+        .expand-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .expand-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .expand-btn i {
+            font-size: 20px;
+            transition: transform var(--transition-fast);
+        }
+
+        .result-card.expanded .expand-btn i {
+            transform: rotate(180deg);
+        }
+
+        /* Result Details */
+        .result-details {
+            display: none;
+            padding: 0 1.25rem 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .result-card.expanded .result-details {
+            display: block;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .detail-label i {
+            font-size: 14px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .detail-value.safe {
+            color: var(--safe);
+        }
+
+        .detail-value.warning {
+            color: var(--warning);
+        }
+
+        .detail-value.danger {
+            color: var(--danger);
+        }
+
+        /* Issues List */
+        .issues-section {
+            margin-top: 1rem;
+        }
+
+        .issues-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .issues-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+        }
+
+        .issue-item.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+        }
+
+        .issue-item.danger {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+        }
+
+        .issue-item i {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .issue-item.warning i {
+            color: var(--warning);
+        }
+
+        .issue-item.danger i {
+            color: var(--danger);
+        }
+
+        /* Redirect Chain */
+        .redirect-chain {
+            margin-top: 1rem;
+        }
+
+        .redirect-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .redirect-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .redirect-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+        }
+
+        .redirect-step-num {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .redirect-step-url {
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .redirect-arrow {
+            color: var(--text-tertiary);
+            text-align: center;
+            font-size: 1.25rem;
+        }
+
+        /* ==================== INFO CARDS ==================== */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .info-card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .info-card-icon i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .info-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ==================== DISCLAIMER ==================== */
+        .disclaimer {
+            background: var(--info-bg);
+            border: 1px solid var(--info-border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .disclaimer i {
+            font-size: 24px;
+            color: var(--info);
+            flex-shrink: 0;
+        }
+
+        .disclaimer-text h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .disclaimer-text p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-tertiary);
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==================== LOADING STATE ==================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-content {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .loading-text {
+            font-weight: 600;
+        }
+
+        .loading-subtext {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                margin-bottom: 2rem;
+            }
+
+            .logo-text {
+                font-size: 2rem;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+                width: 40px;
+                height: 40px;
+            }
+
+            .url-input-wrapper {
+                flex-direction: column;
+            }
+
+            .scan-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .input-tabs {
+                flex-direction: column;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .results-summary {
+                flex-wrap: wrap;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-card-header {
+                flex-wrap: wrap;
+            }
+
+            .batch-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .logo-icon i {
+                font-size: 24px;
+            }
+
+            .logo-text {
+                font-size: 1.75rem;
+            }
+
+            .input-section {
+                padding: 1.25rem;
+            }
+
+            .result-card-header {
+                padding: 0.875rem;
+            }
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .result-card:nth-child(1) { animation-delay: 0.05s; }
+        .result-card:nth-child(2) { animation-delay: 0.1s; }
+        .result-card:nth-child(3) { animation-delay: 0.15s; }
+        .result-card:nth-child(4) { animation-delay: 0.2s; }
+        .result-card:nth-child(5) { animation-delay: 0.25s; }
+
+        /* Progress indicator for scanning */
+        .scan-progress {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .scan-progress.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class='bx bx-moon' id="themeIcon"></i>
+    </button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Scanning URLs...</p>
+            <p class="loading-subtext" id="loadingSubtext">Checking security status</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class='bx bxs-shield-alt-2'></i>
+                </div>
+                <span class="logo-text">Kavach</span>
+            </div>
+            <p class="tagline">Your Digital Shield Against Malicious Links</p>
+            <p class="subtitle">Scan URLs for phishing, malware, and security threats before clicking</p>
+        </header>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-tabs">
+                <button class="tab-btn active" data-tab="single">
+                    <i class='bx bx-link'></i>
+                    Single URL
+                </button>
+                <button class="tab-btn" data-tab="batch">
+                    <i class='bx bx-list-ul'></i>
+                    Batch Scan
+                </button>
+                <button class="tab-btn" data-tab="file">
+                    <i class='bx bx-upload'></i>
+                    Upload File
+                </button>
+            </div>
+
+            <!-- Single URL Input -->
+            <div class="tab-content active" id="tab-single">
+                <div class="url-input-wrapper">
+                    <input 
+                        type="text" 
+                        class="url-input" 
+                        id="singleUrlInput" 
+                        placeholder="Enter URL to scan (e.g., https://example.com)"
+                        autocomplete="off"
+                    >
+                    <button class="scan-btn" id="scanSingleBtn">
+                        <i class='bx bx-search-alt'></i>
+                        Scan URL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Batch Input -->
+            <div class="tab-content" id="tab-batch">
+                <textarea 
+                    class="batch-textarea" 
+                    id="batchUrlInput" 
+                    placeholder="Enter multiple URLs (one per line):&#10;https://example1.com&#10;https://example2.com&#10;https://example3.com"
+                ></textarea>
+                <div class="batch-actions">
+                    <span class="url-count" id="urlCount">0 URLs detected</span>
+                    <button class="scan-btn" id="scanBatchBtn">
+                        <i class='bx bx-search-alt'></i>
+                        Scan All URLs
+                    </button>
+                </div>
+            </div>
+
+            <!-- File Upload -->
+            <div class="tab-content" id="tab-file">
+                <div class="file-upload-area" id="fileUploadArea">
+                    <i class='bx bx-cloud-upload'></i>
+                    <p><span>Click to upload</span> or drag and drop</p>
+                    <p>TXT or CSV file with URLs (one per line)</p>
+                    <input type="file" class="file-input" id="fileInput" accept=".txt,.csv">
+                </div>
+                <div class="batch-actions">
+                    <span class="url-count" id="fileUrlCount">No file selected</span>
+                    <button class="scan-btn" id="scanFileBtn" disabled>
+                        <i class='bx bx-search-alt'></i>
+                        Scan File URLs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="scan-progress" id="scanProgress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p class="progress-text" id="progressText">Scanning: 0/0 URLs</p>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection">
+            <div class="results-header">
+                <div>
+                    <h2 class="results-title">
+                        <i class='bx bx-list-check'></i>
+                        Scan Results
+                    </h2>
+                    <div class="results-summary" id="resultsSummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                <button class="clear-btn" id="clearResultsBtn">
+                    <i class='bx bx-trash'></i>
+                    Clear Results
+                </button>
+            </div>
+            <div class="results-list" id="resultsList">
+                <!-- Results populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class='bx bx-lock-alt'></i>
+                </div>
+                <h3>Privacy First</h3>
+                <p>Your URLs are never stored or logged. All checks run locally in your browser or via secure API calls.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class='bx bx-analyse'></i>
+                </div>
+                <h3>Multi-Layer Analysis</h3>
+                <p>We check URL format, SSL certificates, domain reputation, suspicious patterns, and redirect chains.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class='bx bx-zap'></i>
+                </div>
+                <h3>Instant Results</h3>
+                <p>Get real-time security analysis without any sign-up required. Works instantly in your browser.</p>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <i class='bx bx-info-circle'></i>
+            <div class="disclaimer-text">
+                <h4>Important Disclaimer</h4>
+                <p>Kavach provides client-side security checks using pattern matching and heuristics. While we strive for accuracy, this tool is not a replacement for enterprise security solutions. Always exercise caution with unfamiliar links, even if they appear safe. For critical security needs, consult professional cybersecurity services.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 Kavach - Secure Link Shield. Built with 🛡️ for your protection.</p>
+            <p>No data is stored. Your privacy is our priority.</p>
+        </footer>
+    </div>
+
+    <script>
+        /**
+         * ==================== KAVACH - SECURE LINK CHECKER ====================
+         * A privacy-focused URL security scanner
+         * 
+         * Features:
+         * - URL format validation
+         * - SSL/HTTPS verification
+         * - Suspicious pattern detection
+         * - Phishing domain detection
+         * - URL shortener detection
+         * - Typosquatting detection
+         */
+
+        // ==================== CONFIGURATION ====================
+        const CONFIG = {
+            // Known URL shortener services
+            URL_SHORTENERS: [
+                'bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'ow.ly', 
+                'is.gd', 'buff.ly', 'adf.ly', 'bit.do', 'mcaf.ee',
+                'su.pr', 'yourls.org', 'v.gd', 'short.io', 'cutt.ly',
+                'rb.gy', 'shorturl.at', 't.ly', 's.id', 'clck.ru',
+                'rebrand.ly', 'bl.ink', 'short.link'
+            ],
+            
+            // Known phishing/malicious patterns
+            SUSPICIOUS_PATTERNS: [
+                // Fake login pages
+                /login.*verify/i,
+                /secure.*account.*update/i,
+                /verify.*identity/i,
+                /confirm.*password/i,
+                /account.*suspended/i,
+                /unusual.*activity/i,
+                
+                // Common phishing keywords
+                /paypa[l1].*secure/i,
+                /app[l1]e.*id/i,
+                /netf[l1]ix.*account/i,
+                /amazon.*secure/i,
+                /microsoft.*verify/i,
+                /google.*security/i,
+                /facebook.*confirm/i,
+                
+                // Suspicious file extensions in URL
+                /\.(exe|scr|bat|cmd|vbs|ps1|jar)(\?|$)/i,
+                
+                // Data URI schemes (can hide malicious content)
+                /^data:/i,
+                
+                // IP address URLs (suspicious)
+                /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/,
+                
+                // Excessive subdomains (often used in phishing)
+                /^https?:\/\/[^/]*\.[^/]*\.[^/]*\.[^/]*\.[^/]*\./
+            ],
+            
+            // Popular domains and their common typosquatting variations
+            TYPOSQUATTING_TARGETS: {
+                'google': ['googel', 'gogle', 'googl', 'g00gle', 'goog1e', 'gooogle', 'googlle'],
+                'facebook': ['faceb00k', 'facebok', 'faceboook', 'fecebook', 'faacebook', 'faceb0ok'],
+                'amazon': ['amaz0n', 'amazn', 'amaazon', 'amazonn', 'arnazon', 'amzon'],
+                'apple': ['app1e', 'appel', 'aple', 'applle', 'aplle', 'aaple'],
+                'microsoft': ['micros0ft', 'mircosoft', 'microsfot', 'microsft', 'rnicrosoft'],
+                'paypal': ['paypa1', 'paypall', 'paypl', 'paypai', 'paipal', 'payypal'],
+                'netflix': ['netf1ix', 'netflixx', 'netfix', 'netfilx', 'neflix', 'nettflix'],
+                'twitter': ['twiter', 'twtter', 'twltter', 'twiitter', 'twatter'],
+                'instagram': ['instagran', 'instgram', 'instagam', 'lnstagram', 'instagrum'],
+                'linkedin': ['linkedln', 'linkdin', 'linkedn', '1inkedin', 'linkediin'],
+                'youtube': ['y0utube', 'youttube', 'yotube', 'yuotube', 'youtub'],
+                'github': ['githib', 'guthub', 'glthub', 'githubb', 'gihub'],
+                'dropbox': ['dr0pbox', 'dropb0x', 'drapbox', 'dropboxx'],
+                'whatsapp': ['watsapp', 'whatsap', 'whatapp', 'whatsaap', 'vvhatsapp'],
+                'telegram': ['te1egram', 'telegran', 'telgram', 'telegramm']
+            },
+            
+            // Known malicious TLDs (often used in phishing)
+            SUSPICIOUS_TLDS: [
+                '.tk', '.ml', '.ga', '.cf', '.gq', '.xyz', '.top', '.club',
+                '.work', '.date', '.loan', '.racing', '.win', '.stream',
+                '.download', '.accountant', '.science', '.party', '.click',
+                '.link', '.trade', '.webcam', '.bid', '.review', '.cricket'
+            ],
+            
+            // Legitimate domains that should not trigger warnings
+            TRUSTED_DOMAINS: [
+                'google.com', 'facebook.com', 'amazon.com', 'apple.com',
+                'microsoft.com', 'github.com', 'stackoverflow.com',
+                'youtube.com', 'twitter.com', 'linkedin.com', 'instagram.com',
+                'reddit.com', 'wikipedia.org', 'netflix.com', 'spotify.com',
+                'paypal.com', 'dropbox.com', 'zoom.us', 'slack.com'
+            ]
+        };
+
+        // ==================== STATE ====================
+        let state = {
+            theme: localStorage.getItem('kavach-theme') || 'light',
+            currentTab: 'single',
+            fileUrls: [],
+            results: []
+        };
+
+        // ==================== DOM ELEMENTS ====================
+        const elements = {
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            loadingSubtext: document.getElementById('loadingSubtext'),
+            
+            // Tabs
+            tabBtns: document.querySelectorAll('.tab-btn'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            
+            // Single URL
+            singleUrlInput: document.getElementById('singleUrlInput'),
+            scanSingleBtn: document.getElementById('scanSingleBtn'),
+            
+            // Batch
+            batchUrlInput: document.getElementById('batchUrlInput'),
+            urlCount: document.getElementById('urlCount'),
+            scanBatchBtn: document.getElementById('scanBatchBtn'),
+            
+            // File
+            fileUploadArea: document.getElementById('fileUploadArea'),
+            fileInput: document.getElementById('fileInput'),
+            fileUrlCount: document.getElementById('fileUrlCount'),
+            scanFileBtn: document.getElementById('scanFileBtn'),
+            
+            // Progress
+            scanProgress: document.getElementById('scanProgress'),
+            progressFill: document.getElementById('progressFill'),
+            progressText: document.getElementById('progressText'),
+            
+            // Results
+            resultsSection: document.getElementById('resultsSection'),
+            resultsSummary: document.getElementById('resultsSummary'),
+            resultsList: document.getElementById('resultsList'),
+            clearResultsBtn: document.getElementById('clearResultsBtn')
+        };
+
+        // ==================== UTILITY FUNCTIONS ====================
+
+        /**
+         * Set theme and update UI
+         */
+        function setTheme(theme) {
+            state.theme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('kavach-theme', theme);
+            
+            if (theme === 'dark') {
+                elements.themeIcon.className = 'bx bx-sun';
+            } else {
+                elements.themeIcon.className = 'bx bx-moon';
+            }
+        }
+
+        /**
+         * Extract URLs from text
+         */
+        function extractUrls(text) {
+            const lines = text.split(/[\n\r]+/);
+            const urls = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line && !line.startsWith('#')) {
+                    // Add protocol if missing
+                    if (line && !line.match(/^https?:\/\//i)) {
+                        line = 'https://' + line;
+                    }
+                    if (line) {
+                        urls.push(line);
+                    }
+                }
+            }
+            
+            return [...new Set(urls)]; // Remove duplicates
+        }
+
+        /**
+         * Parse URL and extract components
+         */
+        function parseUrl(urlString) {
+            try {
+                const url = new URL(urlString);
+                return {
+                    valid: true,
+                    protocol: url.protocol,
+                    hostname: url.hostname,
+                    pathname: url.pathname,
+                    search: url.search,
+                    port: url.port,
+                    full: urlString
+                };
+            } catch (e) {
+                return {
+                    valid: false,
+                    full: urlString,
+                    error: 'Invalid URL format'
+                };
+            }
+        }
+
+        /**
+         * Extract domain from hostname
+         */
+        function extractDomain(hostname) {
+            const parts = hostname.split('.');
+            if (parts.length >= 2) {
+                return parts.slice(-2).join('.');
+            }
+            return hostname;
+        }
+
+        /**
+         * Show loading overlay
+         */
+        function showLoading(text = 'Checking security status') {
+            elements.loadingSubtext.textContent = text;
+            elements.loadingOverlay.classList.add('visible');
+        }
+
+        /**
+         * Hide loading overlay
+         */
+        function hideLoading() {
+            elements.loadingOverlay.classList.remove('visible');
+        }
+
+        /**
+         * Update progress bar
+         */
+        function updateProgress(current, total, url = '') {
+            const percent = Math.round((current / total) * 100);
+            elements.progressFill.style.width = `${percent}%`;
+            elements.progressText.textContent = `Scanning: ${current}/${total} URLs`;
+            elements.scanProgress.classList.add('visible');
+        }
+
+        /**
+         * Hide progress bar
+         */
+        function hideProgress() {
+            elements.scanProgress.classList.remove('visible');
+            elements.progressFill.style.width = '0%';
+        }
+
+        // ==================== SECURITY CHECKS ====================
+
+        /**
+         * Check if URL uses HTTPS
+         */
+        function checkHttps(parsedUrl) {
+            return {
+                passed: parsedUrl.protocol === 'https:',
+                message: parsedUrl.protocol === 'https:' 
+                    ? 'Secure HTTPS connection' 
+                    : 'Insecure HTTP connection - data may be intercepted',
+                severity: parsedUrl.protocol === 'https:' ? 'safe' : 'warning'
+            };
+        }
+
+        /**
+         * Check if URL is a known shortener
+         */
+        function checkUrlShortener(parsedUrl) {
+            const domain = parsedUrl.hostname.toLowerCase();
+            const isShortener = CONFIG.URL_SHORTENERS.some(s => 
+                domain === s || domain.endsWith('.' + s)
+            );
+            
+            return {
+                isShortener,
+                message: isShortener 
+                    ? `Shortened URL detected (${domain}) - destination unknown`
+                    : null,
+                severity: 'warning'
+            };
+        }
+
+        /**
+         * Check for suspicious patterns in URL
+         */
+        function checkSuspiciousPatterns(urlString) {
+            const matches = [];
+            
+            for (const pattern of CONFIG.SUSPICIOUS_PATTERNS) {
+                if (pattern.test(urlString)) {
+                    matches.push({
+                        pattern: pattern.toString(),
+                        severity: 'danger'
+                    });
+                }
+            }
+            
+            return matches;
+        }
+
+        /**
+         * Check for typosquatting attempts
+         */
+        function checkTyposquatting(hostname) {
+            const domain = hostname.toLowerCase();
+            const results = [];
+            
+            for (const [legit, typos] of Object.entries(CONFIG.TYPOSQUATTING_TARGETS)) {
+                for (const typo of typos) {
+                    if (domain.includes(typo)) {
+                        results.push({
+                            detected: typo,
+                            legitimate: legit,
+                            message: `Possible typosquatting: "${typo}" looks like "${legit}"`,
+                            severity: 'danger'
+                        });
+                    }
+                }
+            }
+            
+            return results;
+        }
+
+        /**
+         * Check for suspicious TLDs
+         */
+        function checkSuspiciousTld(hostname) {
+            const suspicious = CONFIG.SUSPICIOUS_TLDS.find(tld => 
+                hostname.toLowerCase().endsWith(tld)
+            );
+            
+            return {
+                isSuspicious: !!suspicious,
+                tld: suspicious,
+                message: suspicious 
+                    ? `Suspicious TLD (${suspicious}) - commonly used in phishing`
+                    : null,
+                severity: 'warning'
+            };
+        }
+
+        /**
+         * Check if URL uses IP address instead of domain
+         */
+        function checkIpAddress(hostname) {
+            const ipPattern = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+            const isIp = ipPattern.test(hostname);
+            
+            return {
+                isIp,
+                message: isIp 
+                    ? 'URL uses IP address instead of domain name - potentially suspicious'
+                    : null,
+                severity: 'warning'
+            };
+        }
+
+        /**
+         * Check for excessive subdomains
+         */
+        function checkExcessiveSubdomains(hostname) {
+            const parts = hostname.split('.');
+            const hasExcessive = parts.length > 4;
+            
+            return {
+                hasExcessive,
+                count: parts.length,
+                message: hasExcessive 
+                    ? `Excessive subdomains (${parts.length} levels) - often used in phishing`
+                    : null,
+                severity: 'warning'
+            };
+        }
+
+        /**
+         * Check if domain is in trusted list
+         */
+        function checkTrustedDomain(hostname) {
+            const domain = extractDomain(hostname.toLowerCase());
+            const isTrusted = CONFIG.TRUSTED_DOMAINS.includes(domain);
+            
+            return {
+                isTrusted,
+                domain,
+                message: isTrusted ? `Verified trusted domain: ${domain}` : null
+            };
+        }
+
+        /**
+         * Check for homograph attacks (mixed character sets)
+         */
+        function checkHomographAttack(hostname) {
+            // Check for non-ASCII characters that look like ASCII
+            const hasNonAscii = /[^\x00-\x7F]/.test(hostname);
+            
+            // Check for mixed scripts
+            const hasCyrillic = /[\u0400-\u04FF]/.test(hostname);
+            const hasGreek = /[\u0370-\u03FF]/.test(hostname);
+            
+            const isSuspicious = hasNonAscii || hasCyrillic || hasGreek;
+            
+            return {
+                isSuspicious,
+                message: isSuspicious 
+                    ? 'Potential homograph attack - domain contains non-standard characters'
+                    : null,
+                severity: 'danger'
+            };
+        }
+
+        /**
+         * Main URL analysis function
+         */
+        async function analyzeUrl(urlString) {
+            const result = {
+                url: urlString,
+                status: 'safe',
+                issues: [],
+                details: {},
+                timestamp: new Date().toISOString()
+            };
+
+            // Parse URL
+            const parsed = parseUrl(urlString);
+            result.details.parsed = parsed;
+            
+            if (!parsed.valid) {
+                result.status = 'danger';
+                result.issues.push({
+                    type: 'invalid_url',
+                    message: 'Invalid URL format - cannot be analyzed',
+                    severity: 'danger'
+                });
+                return result;
+            }
+
+            // Run all checks
+            const checks = [];
+
+            // 1. HTTPS Check
+            const httpsCheck = checkHttps(parsed);
+            result.details.https = httpsCheck.passed;
+            if (!httpsCheck.passed) {
+                checks.push({
+                    type: 'no_https',
+                    message: httpsCheck.message,
+                    severity: httpsCheck.severity
+                });
+            }
+
+            // 2. URL Shortener Check
+            const shortenerCheck = checkUrlShortener(parsed);
+            result.details.isShortener = shortenerCheck.isShortener;
+            if (shortenerCheck.isShortener) {
+                checks.push({
+                    type: 'url_shortener',
+                    message: shortenerCheck.message,
+                    severity: shortenerCheck.severity
+                });
+            }
+
+            // 3. Suspicious Patterns Check
+            const patternMatches = checkSuspiciousPatterns(urlString);
+            if (patternMatches.length > 0) {
+                checks.push({
+                    type: 'suspicious_pattern',
+                    message: 'URL contains suspicious patterns commonly used in phishing',
+                    severity: 'danger'
+                });
+            }
+
+            // 4. Typosquatting Check
+            const typosquatting = checkTyposquatting(parsed.hostname);
+            result.details.typosquatting = typosquatting;
+            for (const typo of typosquatting) {
+                checks.push({
+                    type: 'typosquatting',
+                    message: typo.message,
+                    severity: typo.severity
+                });
+            }
+
+            // 5. Suspicious TLD Check
+            const tldCheck = checkSuspiciousTld(parsed.hostname);
+            result.details.suspiciousTld = tldCheck.isSuspicious;
+            if (tldCheck.isSuspicious) {
+                checks.push({
+                    type: 'suspicious_tld',
+                    message: tldCheck.message,
+                    severity: tldCheck.severity
+                });
+            }
+
+            // 6. IP Address Check
+            const ipCheck = checkIpAddress(parsed.hostname);
+            result.details.isIpAddress = ipCheck.isIp;
+            if (ipCheck.isIp) {
+                checks.push({
+                    type: 'ip_address',
+                    message: ipCheck.message,
+                    severity: ipCheck.severity
+                });
+            }
+
+            // 7. Excessive Subdomains Check
+            const subdomainCheck = checkExcessiveSubdomains(parsed.hostname);
+            result.details.subdomainCount = subdomainCheck.count;
+            if (subdomainCheck.hasExcessive) {
+                checks.push({
+                    type: 'excessive_subdomains',
+                    message: subdomainCheck.message,
+                    severity: subdomainCheck.severity
+                });
+            }
+
+            // 8. Trusted Domain Check
+            const trustedCheck = checkTrustedDomain(parsed.hostname);
+            result.details.isTrusted = trustedCheck.isTrusted;
+            result.details.domain = trustedCheck.domain;
+
+            // 9. Homograph Attack Check
+            const homographCheck = checkHomographAttack(parsed.hostname);
+            if (homographCheck.isSuspicious) {
+                checks.push({
+                    type: 'homograph_attack',
+                    message: homographCheck.message,
+                    severity: homographCheck.severity
+                });
+            }
+
+            // Determine overall status
+            result.issues = checks;
+            
+            const hasDanger = checks.some(c => c.severity === 'danger');
+            const hasWarning = checks.some(c => c.severity === 'warning');
+            
+            if (hasDanger) {
+                result.status = 'danger';
+            } else if (hasWarning) {
+                result.status = 'warning';
+            } else {
+                result.status = 'safe';
+            }
+
+            // Add simulated delay for UX (remove in production)
+            await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+
+            return result;
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+
+        /**
+         * Render a single result card
+         */
+        function renderResultCard(result, index) {
+            const statusIcon = {
+                safe: 'bx-check-circle',
+                warning: 'bx-error',
+                danger: 'bx-x-circle'
+            };
+
+            const statusText = {
+                safe: 'Safe to Visit',
+                warning: 'Proceed with Caution',
+                danger: 'Potentially Dangerous'
+            };
+
+            const issuesHtml = result.issues.length > 0 ? `
+                <div class="issues-section">
+                    <h4 class="issues-title">
+                        <i class='bx bx-flag'></i>
+                        Issues Detected (${result.issues.length})
+                    </h4>
+                    <div class="issues-list">
+                        ${result.issues.map(issue => `
+                            <div class="issue-item ${issue.severity}">
+                                <i class='bx ${issue.severity === 'danger' ? 'bx-x-circle' : 'bx-error-circle'}'></i>
+                                <span>${issue.message}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            return `
+                <article class="result-card ${result.status}" data-index="${index}">
+                    <div class="result-card-header" onclick="toggleResultCard(${index})">
+                        <div class="status-icon ${result.status}">
+                            <i class='bx ${statusIcon[result.status]}'></i>
+                        </div>
+                        <div class="result-url-info">
+                            <p class="result-url">${escapeHtml(result.url)}</p>
+                            <span class="result-status-text ${result.status}">
+                                ${result.status === 'safe' ? '🟢' : result.status === 'warning' ? '🟠' : '🔴'} 
+                                ${statusText[result.status]}
+                            </span>
+                        </div>
+                        <button class="expand-btn" aria-label="Toggle details">
+                            <i class='bx bx-chevron-down'></i>
+                        </button>
+                    </div>
+                    <div class="result-details">
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class='bx bx-globe'></i>
+                                    Domain
+                                </span>
+                                <span class="detail-value">
+                                    ${result.details.parsed?.hostname || 'N/A'}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class='bx bx-lock-alt'></i>
+                                    SSL/HTTPS
+                                </span>
+                                <span class="detail-value ${result.details.https ? 'safe' : 'warning'}">
+                                    ${result.details.https ? '✓ Secure' : '✗ Not Secure'}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class='bx bx-badge-check'></i>
+                                    Trusted Domain
+                                </span>
+                                <span class="detail-value ${result.details.isTrusted ? 'safe' : ''}">
+                                    ${result.details.isTrusted ? '✓ Verified' : 'Not in trusted list'}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <i class='bx bx-link-external'></i>
+                                    URL Shortener
+                                </span>
+                                <span class="detail-value ${result.details.isShortener ? 'warning' : 'safe'}">
+                                    ${result.details.isShortener ? '⚠ Yes - Destination Hidden' : 'No'}
+                                </span>
+                            </div>
+                        </div>
+                        ${issuesHtml}
+                    </div>
+                </article>
+            `;
+        }
+
+        /**
+         * Render all results
+         */
+        function renderResults() {
+            if (state.results.length === 0) {
+                elements.resultsSection.classList.remove('visible');
+                return;
+            }
+
+            // Calculate summary
+            const summary = {
+                safe: state.results.filter(r => r.status === 'safe').length,
+                warning: state.results.filter(r => r.status === 'warning').length,
+                danger: state.results.filter(r => r.status === 'danger').length
+            };
+
+            // Render summary badges
+            elements.resultsSummary.innerHTML = `
+                ${summary.safe > 0 ? `
+                    <span class="summary-badge safe">
+                        <i class='bx bx-check-circle'></i>
+                        ${summary.safe} Safe
+                    </span>
+                ` : ''}
+                ${summary.warning > 0 ? `
+                    <span class="summary-badge warning">
+                        <i class='bx bx-error'></i>
+                        ${summary.warning} Suspicious
+                    </span>
+                ` : ''}
+                ${summary.danger > 0 ? `
+                    <span class="summary-badge danger">
+                        <i class='bx bx-x-circle'></i>
+                        ${summary.danger} Dangerous
+                    </span>
+                ` : ''}
+            `;
+
+            // Render result cards (dangerous first, then warnings, then safe)
+            const sortedResults = [...state.results].sort((a, b) => {
+                const order = { danger: 0, warning: 1, safe: 2 };
+                return order[a.status] - order[b.status];
+            });
+
+            elements.resultsList.innerHTML = sortedResults
+                .map((result, index) => renderResultCard(result, index))
+                .join('');
+
+            elements.resultsSection.classList.add('visible');
+        }
+
+        /**
+         * Toggle result card expansion
+         */
+        function toggleResultCard(index) {
+            const cards = document.querySelectorAll('.result-card');
+            cards.forEach((card, i) => {
+                if (parseInt(card.dataset.index) === index) {
+                    card.classList.toggle('expanded');
+                }
+            });
+        }
+
+        /**
+         * Escape HTML to prevent XSS
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== EVENT HANDLERS ====================
+
+        /**
+         * Handle theme toggle
+         */
+        elements.themeToggle.addEventListener('click', () => {
+            setTheme(state.theme === 'light' ? 'dark' : 'light');
+        });
+
+        /**
+         * Handle tab switching
+         */
+        elements.tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                state.currentTab = tab;
+                
+                // Update active states
+                elements.tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                elements.tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `tab-${tab}`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        /**
+         * Handle single URL scan
+         */
+        elements.scanSingleBtn.addEventListener('click', async () => {
+            const url = elements.singleUrlInput.value.trim();
+            
+            if (!url) {
+                alert('Please enter a URL to scan');
+                return;
+            }
+
+            // Add protocol if missing
+            let processedUrl = url;
+            if (!url.match(/^https?:\/\//i)) {
+                processedUrl = 'https://' + url;
+            }
+
+            elements.scanSingleBtn.disabled = true;
+            elements.scanSingleBtn.classList.add('scanning');
+            elements.scanSingleBtn.innerHTML = '<i class="bx bx-loader-alt"></i> Scanning...';
+
+            try {
+                const result = await analyzeUrl(processedUrl);
+                state.results = [result];
+                renderResults();
+            } catch (error) {
+                console.error('Scan error:', error);
+                alert('An error occurred during scanning. Please try again.');
+            } finally {
+                elements.scanSingleBtn.disabled = false;
+                elements.scanSingleBtn.classList.remove('scanning');
+                elements.scanSingleBtn.innerHTML = '<i class="bx bx-search-alt"></i> Scan URL';
+            }
+        });
+
+        /**
+         * Handle enter key in single URL input
+         */
+        elements.singleUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                elements.scanSingleBtn.click();
+            }
+        });
+
+        /**
+         * Handle batch URL input changes
+         */
+        elements.batchUrlInput.addEventListener('input', () => {
+            const urls = extractUrls(elements.batchUrlInput.value);
+            elements.urlCount.textContent = `${urls.length} URL${urls.length !== 1 ? 's' : ''} detected`;
+        });
+
+        /**
+         * Handle batch URL scan
+         */
+        elements.scanBatchBtn.addEventListener('click', async () => {
+            const urls = extractUrls(elements.batchUrlInput.value);
+            
+            if (urls.length === 0) {
+                alert('Please enter at least one URL to scan');
+                return;
+            }
+
+            if (urls.length > 50) {
+                alert('Maximum 50 URLs allowed per batch scan');
+                return;
+            }
+
+            elements.scanBatchBtn.disabled = true;
+            elements.scanBatchBtn.classList.add('scanning');
+            elements.scanBatchBtn.innerHTML = '<i class="bx bx-loader-alt"></i> Scanning...';
+
+            state.results = [];
+            
+            try {
+                for (let i = 0; i < urls.length; i++) {
+                    updateProgress(i + 1, urls.length, urls[i]);
+                    const result = await analyzeUrl(urls[i]);
+                    state.results.push(result);
+                    renderResults();
+                }
+            } catch (error) {
+                console.error('Batch scan error:', error);
+                alert('An error occurred during scanning. Some results may be incomplete.');
+            } finally {
+                hideProgress();
+                elements.scanBatchBtn.disabled = false;
+                elements.scanBatchBtn.classList.remove('scanning');
+                elements.scanBatchBtn.innerHTML = '<i class="bx bx-search-alt"></i> Scan All URLs';
+            }
+        });
+
+        /**
+         * Handle file upload area click
+         */
+        elements.fileUploadArea.addEventListener('click', () => {
+            elements.fileInput.click();
+        });
+
+        /**
+         * Handle drag and drop
+         */
+        elements.fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            elements.fileUploadArea.classList.add('dragover');
+        });
+
+        elements.fileUploadArea.addEventListener('dragleave', () => {
+            elements.fileUploadArea.classList.remove('dragover');
+        });
+
+        elements.fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            elements.fileUploadArea.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        /**
+         * Handle file input change
+         */
+        elements.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        /**
+         * Process uploaded file
+         */
+        function handleFileUpload(file) {
+            if (!file.name.match(/\.(txt|csv)$/i)) {
+                alert('Please upload a .txt or .csv file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                state.fileUrls = extractUrls(content);
+                
+                elements.fileUrlCount.textContent = 
+                    `${state.fileUrls.length} URL${state.fileUrls.length !== 1 ? 's' : ''} found in ${file.name}`;
+                elements.scanFileBtn.disabled = state.fileUrls.length === 0;
+            };
+            reader.readAsText(file);
+        }
+
+        /**
+         * Handle file URL scan
+         */
+        elements.scanFileBtn.addEventListener('click', async () => {
+            if (state.fileUrls.length === 0) {
+                alert('No URLs found in the uploaded file');
+                return;
+            }
+
+            if (state.fileUrls.length > 100) {
+                alert('Maximum 100 URLs allowed per file scan');
+                return;
+            }
+
+            elements.scanFileBtn.disabled = true;
+            elements.scanFileBtn.classList.add('scanning');
+            elements.scanFileBtn.innerHTML = '<i class="bx bx-loader-alt"></i> Scanning...';
+
+            state.results = [];
+            
+            try {
+                for (let i = 0; i < state.fileUrls.length; i++) {
+                    updateProgress(i + 1, state.fileUrls.length, state.fileUrls[i]);
+                    const result = await analyzeUrl(state.fileUrls[i]);
+                    state.results.push(result);
+                    renderResults();
+                }
+            } catch (error) {
+                console.error('File scan error:', error);
+                alert('An error occurred during scanning. Some results may be incomplete.');
+            } finally {
+                hideProgress();
+                elements.scanFileBtn.disabled = false;
+                elements.scanFileBtn.classList.remove('scanning');
+                elements.scanFileBtn.innerHTML = '<i class="bx bx-search-alt"></i> Scan File URLs';
+            }
+        });
+
+        /**
+         * Handle clear results
+         */
+        elements.clearResultsBtn.addEventListener('click', () => {
+            state.results = [];
+            elements.resultsSection.classList.remove('visible');
+            elements.singleUrlInput.value = '';
+            elements.batchUrlInput.value = '';
+            elements.urlCount.textContent = '0 URLs detected';
+            elements.fileUrlCount.textContent = 'No file selected';
+            state.fileUrls = [];
+            elements.scanFileBtn.disabled = true;
+            elements.fileInput.value = '';
+        });
+
+        // ==================== INITIALIZATION ====================
+
+        /**
+         * Initialize the application
+         */
+        function init() {
+            // Apply saved theme
+            setTheme(state.theme);
+            
+            // Add some sample URLs for demo (optional)
+            const demoUrls = [
+                'https://google.com',
+                'http://g00gle.com/login',
+                'https://bit.ly/example',
+                'https://192.168.1.1/admin',
+                'https://secure-paypa1.com/verify'
+            ];
+            
+            console.log('Kavach initialized. Ready to scan URLs.');
+            console.log('Demo URLs you can try:', demoUrls);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Make toggleResultCard available globally
+        window.toggleResultCard = toggleResultCard;
+    </script>
+</body>
+</html>
